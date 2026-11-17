@@ -1,1 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learnova | Learn Big, Earn Big</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
+  <!-- ================= AUTHENTICATION MODAL ================= -->
+  <div id="auth-overlay" class="overlay">
+    <div class="auth-card">
+      <div class="brand-header">
+        <h1>Learnova</h1>
+        <p class="quote-badge">"Learn big, earn big"</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Login</button>
+        <button id="tab-signup" class="tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuth(event)">
+        <div id="name-field" class="input-group hidden">
+          <label for="username">Full Name</label>
+          <input type="text" id="username" placeholder="Enter your student name" />
+        </div>
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required placeholder="student@learnova.com" />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" id="auth-submit-btn" class="primary-btn full-width">Login to Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APPLICATION ================= -->
+  <div id="app-container" class="hidden">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo-box">
+        <h2>Learnova</h2>
+        <span class="mini-quote">"Learn big, earn big"</span>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" onclick="showSection('dashboard', this)">📊 Scoreboard & Home</button>
+        <button class="nav-btn" onclick="showSection('subjects', this)">📚 Subjects & Syllabus</button>
+        <button class="nav-btn" onclick="showSection('flashcards', this)">🗂️ Smart Flashcards</button>
+        <button class="nav-btn" onclick="showSection('timer', this)">⏱️ Focus Timer</button>
+        <button class="nav-btn" onclick="showSection('assistant', this)">🤖 AI Study Assistant</button>
+      </nav>
+
+      <!-- Custom User Image Slot -->
+      <div class="custom-banner-slot">
+        <!-- REPLACE THE 'src' BELOW WITH YOUR OWN PICTURE FILE (e.g., "study-vibes.jpg") -->
+        <img id="sidebar-custom-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Custom Study Motivation" />
+        <label class="upload-label">
+          🖼️ Change Picture
+          <input type="file" accept="image/*" onchange="previewCustomImage(event, 'sidebar-custom-img')" hidden />
+        </label>
+      </div>
+
+      <div class="user-footer">
+        <span id="display-user-name">Student</span>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Hero Banner with Quote -->
+      <header class="top-hero">
+        <div>
+          <h1 id="welcome-heading">Welcome back, Scholar!</h1>
+          <p class="hero-quote">"Learn big, earn big" — Every small study session builds your future.</p>
+        </div>
+        <div class="hero-img-wrapper">
+          <!-- REPLACE THE 'src' BELOW WITH YOUR OWN HEADER PICTURE -->
+          <img id="hero-custom-img" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80" alt="Hero Banner" />
+          <label class="mini-upload-btn" title="Upload your own picture">
+            📷
+            <input type="file" accept="image/*" onchange="previewCustomImage(event, 'hero-custom-img')" hidden />
+          </label>
+        </div>
+      </header>
+
+      <!-- 1. SCOREBOARD & PROGRESS SECTION -->
+      <section id="sec-dashboard" class="content-section">
+        <h2 class="section-title">🏆 Student Progress Scoreboard</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Study XP</h3>
+            <p id="stat-xp" class="stat-number">0 XP</p>
+            <span class="stat-sub">+10 XP per flashcard | +50 XP per focus session</span>
+          </div>
+          <div class="stat-card">
+            <h3>Cards Mastered</h3>
+            <p id="stat-cards" class="stat-number">0</p>
+            <span class="stat-sub">Keep flipping to boost memory</span>
+          </div>
+          <div class="stat-card">
+            <h3>Focus Sessions</h3>
+            <p id="stat-sessions" class="stat-number">0</p>
+            <span class="stat-sub">25-minute deep work blocks</span>
+          </div>
+          <div class="stat-card">
+            <h3>Syllabus Topics</h3>
+            <p id="stat-syllabus" class="stat-number">5</p>
+            <span class="stat-sub">Active topics across subjects</span>
+          </div>
+        </div>
+
+        <div class="progress-panel">
+          <h3>Overall Mastery Progress</h3>
+          <div class="progress-bar-bg">
+            <div id="mastery-bar" class="progress-bar-fill" style="width: 15%;"></div>
+          </div>
+          <p id="rank-label" class="rank-text">Current Rank: Rising Learner (Level 1)</p>
+        </div>
+      </section>
+
+      <!-- 2. SUBJECTS & SYLLABUS SECTION -->
+      <section id="sec-subjects" class="content-section hidden">
+        <h2 class="section-title">📚 Subjects & Custom Syllabus Manager</h2>
+        <p class="section-desc">Add your exam syllabus topics to any subject below. Adding a syllabus automatically unlocks study points and updates your flashcards!</p>
+        
+        <div id="subjects-grid" class="subjects-grid">
+          <!-- Subject cards injected dynamically via JavaScript -->
+        </div>
+      </section>
+
+      <!-- 3. FLASHCARDS SECTION -->
+      <section id="sec-flashcards" class="content-section hidden">
+        <div class="section-header-row">
+          <h2 class="section-title">🗂️ Interactive Subject Flashcards</h2>
+          <select id="flashcard-subject-filter" onchange="filterFlashcards()" class="styled-select">
+            <option value="All">All Subjects</option>
+            <option value="Maths">Maths</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Physics">Physics</option>
+            <option value="Biology">Biology</option>
+            <option value="Social Science">Social Science</option>
+          </select>
+        </div>
+
+        <!-- Add Custom Flashcard Form -->
+        <div class="add-card-box">
+          <select id="new-card-subject" class="styled-select">
+            <option value="Maths">Maths</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Physics">Physics</option>
+            <option value="Biology">Biology</option>
+            <option value="Social Science">Social Science</option>
+          </select>
+          <input type="text" id="new-card-q" placeholder="Enter question or syllabus term..." />
+          <input type="text" id="new-card-a" placeholder="Enter answer or definition..." />
+          <button onclick="addFlashcard()" class="primary-btn">+ Add Card</button>
+        </div>
+
+        <!-- Active Flashcard Viewer -->
+        <div class="flashcard-stage">
+          <div id="flashcard-box" class="flashcard" onclick="flipCard()">
+            <div class="flashcard-inner" id="flashcard-inner">
+              <div class="flashcard-front">
+                <span id="card-tag" class="card-badge">Maths</span>
+                <p id="card-question">Loading question...</p>
+                <small>Click card to flip 🔄</small>
+              </div>
+              <div class="flashcard-back">
+                <span class="card-badge">Answer</span>
+                <p id="card-answer">Loading answer...</p>
+                <small>Click to flip back</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="flashcard-controls">
+            <button onclick="prevCard()" class="secondary-btn">⬅️ Previous</button>
+            <button onclick="markMastered()" class="success-btn">✅ Mark Mastered (+10 XP)</button>
+            <button onclick="nextCard()" class="secondary-btn">Next ➡️</button>
+          </div>
+          <p id="card-counter" class="card-counter">Card 1 of 10</p>
+        </div>
+      </section>
+
+      <!-- 4. FOCUS TIMER SECTION -->
+      <section id="sec-timer" class="content-section hidden">
+        <h2 class="section-title">⏱️ Deep Focus Pomodoro Timer</h2>
+        <div class="timer-card">
+          <div class="timer-modes">
+            <button class="mode-btn active" onclick="setTimerMode(25, this)">Focus (25m)</button>
+            <button class="mode-btn" onclick="setTimerMode(5, this)">Short Break (5m)</button>
+            <button class="mode-btn" onclick="setTimerMode(45, this)">Deep Study (45m)</button>
+          </div>
+          <div id="timer-display" class="timer-clock">25:00</div>
+          <p class="timer-quote">"Learn big, earn big" — Stay off distractions until the bell rings.</p>
+          <div class="timer-actions">
+            <button onclick="startTimer()" class="primary-btn">▶️ Start</button>
+            <button onclick="pauseTimer()" class="secondary-btn">⏸️ Pause</button>
+            <button onclick="resetTimer()" class="secondary-btn">🔄 Reset</button>
+            <button onclick="completeSessionEarly()" class="success-btn">⚡ Finish & Claim +50 XP</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. AI STUDY ASSISTANT SECTION -->
+      <section id="sec-assistant" class="content-section hidden">
+        <h2 class="section-title">🤖 Learnova AI Study Assistant</h2>
+        <div class="chat-container">
+          <div id="chat-messages" class="chat-messages">
+            <div class="msg ai-msg">
+              Hello! I am your Learnova AI Tutor. Ask me any question about <strong>Maths, Chemistry, Physics, Biology, Social Science</strong>, or how to overcome study stress!
+            </div>
+          </div>
+          <form class="chat-input-row" onsubmit="sendChatMessage(event)">
+            <input type="text" id="chat-input" placeholder="Ask a study question (e.g., What is photosynthesis or Pythagoras theorem?)..." required />
+            <button type="submit" class="primary-btn">Ask AI</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Syllabus Modal -->
+  <div id="syllabus-modal" class="overlay hidden">
+    <div class="modal-card">
+      <h3 id="modal-subject-title">Add Syllabus</h3>
+      <p>Enter topics or chapters for this subject (separated by commas or new lines):</p>
+      <textarea id="syllabus-input" rows="4" placeholder="e.g., Quadratic Equations, Trigonometry, Probability"></textarea>
+      <div class="modal-actions">
+        <button onclick="closeSyllabusModal()" class="secondary-btn">Cancel</button>
+        <button onclick="saveSyllabus()" class="primary-btn">Save Syllabus (+20 XP)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+  </html>
