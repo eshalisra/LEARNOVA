@@ -1,50 +1,32 @@
-// ==================== INITIAL DATA & STATE ====================
-let currentUser = JSON.parse(localStorage.getItem("learnova_user")) || null;
-let userXP = parseInt(localStorage.getItem("learnova_xp")) || 0;
-let cardsMasteredCount = parseInt(localStorage.getItem("learnova_cards")) || 0;
-let focusSessionsCount = parseInt(localStorage.getItem("learnova_sessions")) || 0;
+// ================= STATE & DATA =================
+let authMode = 'login';
+let currentUser = { name: 'Scholar', email: '' };
+let stats = { xp: 0, cardsMastered: 0, sessions: 0 };
 
-// Default Subjects & Syllabus Data
-let subjectsData = JSON.parse(localStorage.getItem("learnova_subjects")) || [
-  { name: "Maths", icon: "📐", topics: ["Algebra Basics", "Linear Equations"] },
-  { name: "Chemistry", icon: "⚗️", topics: ["Atomic Structure", "Periodic Table"] },
-  { name: "Physics", icon: "⚡", topics: ["Motion & Force", "Work & Energy"] },
-  { name: "Biology", icon: "🧬", topics: ["Cell Structure", "Photosynthesis"] },
-  { name: "Social Science", icon: "🌍", topics: ["World History", "Civics"] }
+const subjectsData = [
+  { name: 'Maths', icon: '📐', syllabus: ['Quadratic Equations', 'Trigonometry Basics'] },
+  { name: 'Chemistry', icon: '🧪', syllabus: ['Periodic Table Trends', 'Chemical Bonding'] },
+  { name: 'Physics', icon: '⚡', syllabus: ["Newton's Laws of Motion", 'Optics & Light'] },
+  { name: 'Biology', icon: '🧬', syllabus: ['Cell Structure', 'Photosynthesis'] },
+  { name: 'Social Science', icon: '🌍', syllabus: ['Industrial Revolution', 'Constitutional Rights'] }
 ];
 
-// Default Flashcards
-let flashcardsData = JSON.parse(localStorage.getItem("learnova_flashcards")) || [
-  { subject: "Maths", q: "What is the formula for the area of a circle?", a: "A = πr²" },
-  { subject: "Maths", q: "What is the value of Pi (π) to 2 decimal places?", a: "3.14" },
-  { subject: "Chemistry", q: "What is the chemical symbol for Water?", a: "H₂O" },
-  { subject: "Chemistry", q: "What gas do plants absorb from the atmosphere?", a: "Carbon Dioxide (CO₂)" },
-  { subject: "Physics", q: "What is the acceleration due to gravity on Earth?", a: "9.8 m/s²" },
-  { subject: "Physics", q: "What law states that every action has an equal and opposite reaction?", a: "Newton's Third Law of Motion" },
-  { subject: "Biology", q: "What is known as the powerhouse of the cell?", a: "Mitochondria" },
-  { subject: "Social Science", q: "Who was the first President of the United States?", a: "George Washington" }
+let flashcards = [
+  { subject: 'Maths', q: 'What is the Pythagorean theorem?', a: 'a² + b² = c² (in a right-angled triangle).' },
+  { subject: 'Maths', q: 'What is the quadratic formula?', a: 'x = (-b ± √(b² - 4ac)) / 2a' },
+  { subject: 'Chemistry', q: 'What is the pH of pure water?', a: '7 (Neutral on the pH scale).' },
+  { subject: 'Chemistry', q: 'What is a covalent bond?', a: 'A chemical bond formed by sharing electron pairs between atoms.' },
+  { subject: 'Physics', q: "State Newton's Second Law of Motion.", a: 'Force equals mass times acceleration (F = ma).' },
+  { subject: 'Physics', q: 'What is the speed of light in a vacuum?', a: 'Approximately 3 × 10⁸ meters per second.' },
+  { subject: 'Biology', q: 'Which organelle is the powerhouse of the cell?', a: 'Mitochondria (produces ATP energy).' },
+  { subject: 'Biology', q: 'What gas do plants absorb during photosynthesis?', a: 'Carbon Dioxide (CO₂).' },
+  { subject: 'Social Science', q: 'What are the three branches of democratic government?', a: 'Legislative, Executive, and Judiciary.' },
+  { subject: 'Social Science', q: 'Where did the Industrial Revolution begin?', a: 'Great Britain in the late 18th century.' }
 ];
 
-
-
-// ==================== APP INITIALIZATION ====================
-document.addEventListener("DOMContentLoaded", () => {
-  injectQuizSection(); // Injects Quiz section into main content dynamically
-  injectQuizNavButton(); // Injects Quiz button into sidebar navigation
-  
-  if (currentUser) {
-    showAppContainer();
-  } else {
-    showAuthOverlay();
-  }
-  updateStatsUI();
-  renderSubjects();
-  loadCurrentCard();
-  loadQuizQuestion();
-});
-// ================= QUIZ DATA (25+ Questions Per Subject) =================
+// ================= QUIZ DATA (25 Questions Per Subject) =================
 let quizData = [
-  // --- MATHS (25 Questions) ---
+  // --- MATHS ---
   { subject: 'Maths', question: 'What is the value of 9 x 8?', options: ['72', '81', '64', '56'], answer: 0 },
   { subject: 'Maths', question: 'What is the square root of 144?', options: ['10', '11', '12', '14'], answer: 2 },
   { subject: 'Maths', question: 'What is the value of Pi (π) to 2 decimal places?', options: ['3.14', '3.16', '3.12', '3.18'], answer: 0 },
@@ -71,7 +53,7 @@ let quizData = [
   { subject: 'Maths', question: 'What is the probability of rolling a 6 on a standard die?', options: ['1/2', '1/3', '1/6', '1/4'], answer: 2 },
   { subject: 'Maths', question: 'What is the next number in the sequence: 2, 4, 8, 16, ?', options: ['24', '30', '32', '64'], answer: 2 },
 
-  // --- CHEMISTRY (25 Questions) ---
+  // --- CHEMISTRY ---
   { subject: 'Chemistry', question: 'What is the chemical symbol for Gold?', options: ['Ag', 'Au', 'Gd', 'Go'], answer: 1 },
   { subject: 'Chemistry', question: 'What is the chemical formula for Water?', options: ['CO2', 'H2O', 'NaCl', 'O2'], answer: 1 },
   { subject: 'Chemistry', question: 'What is the pH of pure neutral water?', options: ['5', '7', '9', '14'], answer: 1 },
@@ -98,7 +80,7 @@ let quizData = [
   { subject: 'Chemistry', question: 'What is the chemical symbol for Potassium?', options: ['P', 'Pt', 'K', 'Po'], answer: 2 },
   { subject: 'Chemistry', question: 'What is rust chemically classified as?', options: ['Iron sulfide', 'Iron oxide', 'Iron chloride', 'Iron carbonate'], answer: 1 },
 
-  // --- PHYSICS (25 Questions) ---
+  // --- PHYSICS ---
   { subject: 'Physics', question: 'Which planet is known as the Red Planet?', options: ['Venus', 'Saturn', 'Mars', 'Jupiter'], answer: 2 },
   { subject: 'Physics', question: 'What unit is used to measure electrical resistance?', options: ['Volt', 'Ampere', 'Ohm', 'Watt'], answer: 2 },
   { subject: 'Physics', question: 'What is the acceleration due to gravity on Earth?', options: ['8.9 m/s²', '9.8 m/s²', '10.5 m/s²', '11.2 m/s²'], answer: 1 },
@@ -125,7 +107,7 @@ let quizData = [
   { subject: 'Physics', question: 'What is the SI unit of frequency?', options: ['Second', 'Meter', 'Hertz', 'Newton'], answer: 2 },
   { subject: 'Physics', question: 'What is the absolute zero temperature in Celsius?', options: ['0°C', '-100°C', '-273.15°C', '-373°C'], answer: 2 },
 
-  // --- BIOLOGY (25 Questions) ---
+  // --- BIOLOGY ---
   { subject: 'Biology', question: 'Which organelle is known as the powerhouse of the cell?', options: ['Nucleus', 'Ribosome', 'Mitochondria', 'Golgi Body'], answer: 2 },
   { subject: 'Biology', question: 'What blood type is considered the universal donor?', options: ['A positive', 'B positive', 'AB positive', 'O negative'], answer: 3 },
   { subject: 'Biology', question: 'What is the process by which plants make their food?', options: ['Respiration', 'Transpiration', 'Photosynthesis', 'Fermentation'], answer: 2 },
@@ -152,7 +134,7 @@ let quizData = [
   { subject: 'Biology', question: 'Which vitamin deficiency causes scurvy?', options: ['Vitamin A', 'Vitamin B', 'Vitamin C', 'Vitamin D'], answer: 2 },
   { subject: 'Biology', question: 'What is the scientific name for human beings?', options: ['Homo erectus', 'Homo sapiens', 'Australopithecus', 'Pan troglodytes'], answer: 1 },
 
-  // --- SOCIAL SCIENCE (25 Questions) ---
+  // --- SOCIAL SCIENCE ---
   { subject: 'Social Science', question: 'Who was the first President of the United States?', options: ['George Washington', 'Abraham Lincoln', 'Thomas Jefferson', 'John Adams'], answer: 0 },
   { subject: 'Social Science', question: 'In which year did World War II end?', options: ['1940', '1945', '1950', '1939'], answer: 1 },
   { subject: 'Social Science', question: 'Where did the Industrial Revolution begin?', options: ['France', 'United States', 'Great Britain', 'Germany'], answer: 2 },
@@ -177,103 +159,47 @@ let quizData = [
   { subject: 'Social Science', question: 'Which desert is the largest hot desert in the world?', options: ['Gobi Desert', 'Kalahari Desert', 'Sahara Desert', 'Mojave Desert'], answer: 2 },
   { subject: 'Social Science', question: 'What form of government is ruled by a king or queen?', options: ['Democracy', 'Oligarchy', 'Monarchy', 'Republic'], answer: 2 },
   { subject: 'Social Science', question: 'In which year did the French Revolution begin?', options: ['1776', '1789', '1804', '1815'], answer: 1 },
-// ==================== AUTHENTICATION LOGIC ====================
-function switchAuthTab(tab) {
-  const loginBtn = document.getElementById("tab-login");
-  const signupBtn = document.getElementById("tab-signup");
-  const nameField = document.getElementById("name-field");
-  const submitBtn = document.getElementById("auth-submit-btn");
+  { subject: 'Social Science', question: 'What is the currency used in Japan?', options: ['Yuan', 'Won', 'Yen', 'Dollar'], answer: 2 }
+];
 
-  if (tab === "login") {
-    loginBtn.classList.add("active");
-    signupBtn.classList.remove("active");
-    nameField.classList.add("hidden");
-    submitBtn.innerText = "Login to Dashboard";
-    document.getElementById("auth-form").dataset.mode = "login";
-  } else {
-    signupBtn.classList.add("active");
-    loginBtn.classList.remove("active");
-    nameField.classList.remove("hidden");
-    submitBtn.innerText = "Create Account & Start";
-    document.getElementById("auth-form").dataset.mode = "signup";
-  }
-}
+let filteredCards = [...flashcards];
+let currentCardIndex = 0;
+let activeSubjectForModal = null;
 
-function handleAuth(event) {
-  event.preventDefault();
-  const mode = document.getElementById("auth-form").dataset.mode || "login";
-  const email = document.getElementById("email").value;
-  const nameInput = document.getElementById("username").value;
+// Quiz State
+let currentQuizIndex = 0;
+let quizScore = 0;
+let selectedQuizFilter = 'All';
 
-  let userName = "Scholar";
-  if (mode === "signup" && nameInput.trim() !== "") {
-    userName = nameInput.trim();
-  } else if (currentUser) {
-    userName = currentUser;
-  } else {
-    userName = email.split("@")[0];
-    userName = userName.charAt(0).toUpperCase() + userName.slice(1);
-  }
+// ================= APP INITIALIZATION =================
+document.addEventListener('DOMContentLoaded', () => {
+  injectQuizNavButton();
+  injectQuizSection();
+});
 
-  currentUser = userName;
-  localStorage.setItem("learnova_user", JSON.stringify(currentUser));
-  showAppContainer();
-}
-
-function logout() {
-  localStorage.removeItem("learnova_user");
-  currentUser = null;
-  showAuthOverlay();
-}
-
-function showAuthOverlay() {
-  document.getElementById("auth-overlay").classList.remove("hidden");
-  document.getElementById("app-container").classList.add("hidden");
-}
-
-function showAppContainer() {
-  document.getElementById("auth-overlay").classList.add("hidden");
-  document.getElementById("app-container").classList.remove("hidden");
-  document.getElementById("display-user-name").innerText = currentUser;
-  document.getElementById("welcome-heading").innerText = `Welcome back, ${currentUser}!`;
-}
-
-// ==================== NAVIGATION LOGIC ====================
-function showSection(sectionId, btnElement) {
-  document.querySelectorAll(".content-section").forEach(sec => {
-    sec.classList.add("hidden");
-  });
-  document.getElementById(`sec-${sectionId}`).classList.remove("hidden");
-
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.classList.remove("active");
-  });
-  if (btnElement) btnElement.classList.add("active");
-}
-
-// ==================== DYNAMICALLY INJECT QUIZ FEATURES ====================
+// ================= DYNAMICALLY INJECT QUIZ UI =================
 function injectQuizNavButton() {
-  const navLinks = document.querySelector(".nav-links");
-  if (!document.getElementById("nav-quiz-btn")) {
-    const quizNavBtn = document.createElement("button");
-    quizNavBtn.id = "nav-quiz-btn";
-    quizNavBtn.className = "nav-btn";
-    quizNavBtn.innerHTML = "🧠 Practice Quiz";
-    quizNavBtn.onclick = function() { showSection('quiz', this); };
-    navLinks.appendChild(quizNavBtn);
+  const navLinks = document.querySelector('.nav-links');
+  if (navLinks && !document.getElementById('nav-quiz-btn')) {
+    const btn = document.createElement('button');
+    btn.id = 'nav-quiz-btn';
+    btn.className = 'nav-btn';
+    btn.innerHTML = '🧠 Practice Quiz';
+    btn.onclick = function() { showSection('quiz', this); };
+    navLinks.appendChild(btn);
   }
 }
 
 function injectQuizSection() {
-  const mainContent = document.querySelector(".main-content");
-  if (!document.getElementById("sec-quiz")) {
-    const quizSection = document.createElement("section");
-    quizSection.id = "sec-quiz";
-    quizSection.className = "content-section hidden";
-    quizSection.innerHTML = `
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent && !document.getElementById('sec-quiz')) {
+    const section = document.createElement('section');
+    section.id = 'sec-quiz';
+    section.className = 'content-section hidden';
+    section.innerHTML = `
       <div class="section-header-row">
         <h2 class="section-title">🧠 Interactive Subject Practice Quiz</h2>
-        <select id="quiz-subject-filter" onchange="filterQuiz()" class="styled-select">
+        <select id="quiz-subject-filter" onchange="filterQuiz()" class="styled-select" style="padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
           <option value="All">All Subjects</option>
           <option value="Maths">Maths</option>
           <option value="Chemistry">Chemistry</option>
@@ -283,7 +209,7 @@ function injectQuizSection() {
         </select>
       </div>
 
-      <div class="quiz-container" style="max-width: 100%; margin: 20px 0;">
+      <div class="quiz-container" style="background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-top: 20px;">
         <div id="quiz-box">
           <p id="quiz-question-text" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;">Loading question...</p>
           <div id="quiz-options-container"></div>
@@ -296,84 +222,310 @@ function injectQuizSection() {
         </div>
       </div>
     `;
-    mainContent.appendChild(quizSection);
+    mainContent.appendChild(section);
+    loadQuizQuestion();
   }
 }
 
-// ==================== QUIZ LOGIC ====================
+// ================= AUTHENTICATION =================
+function switchAuthTab(mode) {
+  authMode = mode;
+  const loginBtn = document.getElementById('tab-login');
+  const signupBtn = document.getElementById('tab-signup');
+  const nameField = document.getElementById('name-field');
+  const submitBtn = document.getElementById('auth-submit-btn');
+
+  if (loginBtn) loginBtn.classList.toggle('active', mode === 'login');
+  if (signupBtn) signupBtn.classList.toggle('active', mode === 'signup');
+  if (nameField) nameField.classList.toggle('hidden', mode === 'login');
+  if (submitBtn) submitBtn.textContent = mode === 'login' ? 'Login to Dashboard' : 'Create Account & Start';
+}
+
+function handleAuth(e) {
+  e.preventDefault();
+  const emailInput = document.getElementById('email');
+  const nameInput = document.getElementById('username');
+  
+  const email = emailInput ? emailInput.value.trim() : 'scholar@learnova.com';
+  const nameVal = nameInput ? nameInput.value.trim() : '';
+
+  if (authMode === 'signup' && nameVal) {
+    currentUser.name = nameVal;
+  } else {
+    currentUser.name = email.split('@')[0] || 'Scholar';
+    currentUser.name = currentUser.name.charAt(0).toUpperCase() + currentUser.name.slice(1);
+  }
+  currentUser.email = email;
+
+  const displayName = document.getElementById('display-user-name');
+  const welcomeHeading = document.getElementById('welcome-heading');
+  const authOverlay = document.getElementById('auth-overlay');
+  const appContainer = document.getElementById('app-container');
+
+  if (displayName) displayName.textContent = currentUser.name;
+  if (welcomeHeading) welcomeHeading.textContent = `Welcome back, ${currentUser.name}!`;
+  if (authOverlay) authOverlay.classList.add('hidden');
+  if (appContainer) appContainer.classList.remove('hidden');
+
+  renderSubjects();
+  renderFlashcard();
+  updateScoreboard();
+}
+
+function logout() {
+  const authOverlay = document.getElementById('auth-overlay');
+  const appContainer = document.getElementById('app-container');
+  if (appContainer) appContainer.classList.add('hidden');
+  if (authOverlay) authOverlay.classList.remove('hidden');
+}
+
+// ================= NAVIGATION =================
+function showSection(sectionId, btn) {
+  document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
+  const target = document.getElementById(`sec-${sectionId}`);
+  if (target) target.classList.remove('hidden');
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ================= CUSTOM IMAGE UPLOAD =================
+function previewCustomImage(event, imgElementId) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(imgElementId);
+      if (img) img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// ================= SUBJECTS & SYLLABUS =================
+function renderSubjects() {
+  const grid = document.getElementById('subjects-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  subjectsData.forEach((subj, idx) => {
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    const listItems = subj.syllabus.map(topic => `<li>${topic}</li>`).join('');
+
+    card.innerHTML = `
+      <div>
+        <div class="subject-header">
+          <h3>${subj.icon} ${subj.name}</h3>
+          <span class="card-badge">${subj.syllabus.length} Topics</span>
+        </div>
+        <ul class="syllabus-list">${listItems}</ul>
+      </div>
+      <button class="primary-btn full-width" onclick="openSyllabusModal(${idx})">+ Add Syllabus</button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function openSyllabusModal(index) {
+  activeSubjectForModal = index;
+  const title = document.getElementById('modal-subject-title');
+  const input = document.getElementById('syllabus-input');
+  const modal = document.getElementById('syllabus-modal');
+
+  if (title) title.textContent = `Add Syllabus: ${subjectsData[index].name}`;
+  if (input) input.value = '';
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeSyllabusModal() {
+  const modal = document.getElementById('syllabus-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function saveSyllabus() {
+  const input = document.getElementById('syllabus-input');
+  if (!input) return;
+  const rawText = input.value.trim();
+  if (!rawText) return;
+
+  const topics = rawText.split(/[\n,]+/).map(t => t.trim()).filter(Boolean);
+  const subjectObj = subjectsData[activeSubjectForModal];
+
+  topics.forEach(topic => {
+    subjectObj.syllabus.push(topic);
+    flashcards.push({
+      subject: subjectObj.name,
+      q: `Syllabus Key Topic (${subjectObj.name}): Explain "${topic}"`,
+      a: `Review core definitions, formulas, and key examples for ${topic}.`
+    });
+  });
+
+  stats.xp += 20;
+  closeSyllabusModal();
+  renderSubjects();
+  filterFlashcards();
+  updateScoreboard();
+}
+
+// ================= FLASHCARDS =================
+function filterFlashcards() {
+  const select = document.getElementById('flashcard-subject-filter');
+  const selected = select ? select.value : 'All';
+  filteredCards = selected === 'All'
+    ? [...flashcards]
+    : flashcards.filter(c => c.subject === selected);
+
+  currentCardIndex = 0;
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  const cardBox = document.getElementById('flashcard-box');
+  if (!cardBox) return;
+  cardBox.classList.remove('flipped');
+
+  if (filteredCards.length === 0) {
+    document.getElementById('card-tag').textContent = 'Empty';
+    document.getElementById('card-question').textContent = 'No cards in this subject yet. Add one above!';
+    document.getElementById('card-answer').textContent = 'Add a card to start studying.';
+    document.getElementById('card-counter').textContent = 'Card 0 of 0';
+    return;
+  }
+
+  const card = filteredCards[currentCardIndex];
+  document.getElementById('card-tag').textContent = card.subject;
+  document.getElementById('card-question').textContent = card.q;
+  document.getElementById('card-answer').textContent = card.a;
+  document.getElementById('card-counter').textContent = `Card ${currentCardIndex + 1} of ${filteredCards.length}`;
+}
+
+function flipCard() {
+  const cardBox = document.getElementById('flashcard-box');
+  if (cardBox) cardBox.classList.toggle('flipped');
+}
+
+function nextCard() {
+  if (filteredCards.length === 0) return;
+  currentCardIndex = (currentCardIndex + 1) % filteredCards.length;
+  renderFlashcard();
+}
+
+function prevCard() {
+  if (filteredCards.length === 0) return;
+  currentCardIndex = (currentCardIndex - 1 + filteredCards.length) % filteredCards.length;
+  renderFlashcard();
+}
+
+function addFlashcard() {
+  const subjectEl = document.getElementById('new-card-subject');
+  const qEl = document.getElementById('new-card-q');
+  const aEl = document.getElementById('new-card-a');
+
+  if (!subjectEl || !qEl || !aEl) return;
+
+  const subject = subjectEl.value;
+  const q = qEl.value.trim();
+  const a = aEl.value.trim();
+
+  if (!q || !a) return;
+
+  flashcards.push({ subject, q, a });
+  qEl.value = '';
+  aEl.value = '';
+  filterFlashcards();
+}
+
+function markMastered() {
+  stats.cardsMastered += 1;
+  stats.xp += 10;
+  updateScoreboard();
+  nextCard();
+}
+
+// ================= QUIZ LOGIC =================
 function filterQuiz() {
-  selectedQuizFilter = document.getElementById("quiz-subject-filter").value;
+  const filterEl = document.getElementById('quiz-subject-filter');
+  selectedQuizFilter = filterEl ? filterEl.value : 'All';
   currentQuizIndex = 0;
   quizScore = 0;
   loadQuizQuestion();
 }
 
 function getFilteredQuizData() {
-  if (selectedQuizFilter === "All") return quizData;
+  if (selectedQuizFilter === 'All') return quizData;
   return quizData.filter(q => q.subject === selectedQuizFilter);
 }
 
 function loadQuizQuestion() {
   const filtered = getFilteredQuizData();
-  const quizBox = document.getElementById("quiz-box");
-  const resultBox = document.getElementById("quiz-result-box");
+  const quizBox = document.getElementById('quiz-box');
+  const resultBox = document.getElementById('quiz-result-box');
   
+  if (!quizBox || !resultBox) return;
+
   if (filtered.length === 0) {
-    document.getElementById("quiz-question-text").innerText = "No quiz questions available for this subject yet.";
-    document.getElementById("quiz-options-container").innerHTML = "";
-    document.getElementById("quiz-next-btn").style.display = "none";
+    document.getElementById('quiz-question-text').textContent = 'No quiz questions available for this subject yet.';
+    document.getElementById('quiz-options-container').innerHTML = '';
+    const nextBtn = document.getElementById('quiz-next-btn');
+    if (nextBtn) nextBtn.style.display = 'none';
     return;
   }
 
-  quizBox.style.display = "block";
-  resultBox.style.display = "none";
+  quizBox.style.display = 'block';
+  resultBox.style.display = 'none';
 
   if (currentQuizIndex >= filtered.length) {
-    quizBox.style.display = "none";
-    resultBox.style.display = "block";
-    document.getElementById("quiz-score-text").innerText = `You scored ${quizScore} out of ${filtered.length}!`;
-    
-    // Award XP for completing quiz
-    addXP(15);
+    quizBox.style.display = 'none';
+    resultBox.style.display = 'block';
+    const scoreText = document.getElementById('quiz-score-text');
+    if (scoreText) scoreText.textContent = `You scored ${quizScore} out of ${filtered.length}!`;
+    stats.xp += 15;
+    updateScoreboard();
     return;
   }
 
   const q = filtered[currentQuizIndex];
-  document.getElementById("quiz-question-text").innerText = `Q${currentQuizIndex + 1}: ${q.question}`;
+  const qText = document.getElementById('quiz-question-text');
+  if (qText) qText.textContent = `Q${currentQuizIndex + 1}: ${q.question}`;
   
-  const optionsContainer = document.getElementById("quiz-options-container");
-  optionsContainer.innerHTML = "";
-  document.getElementById("quiz-next-btn").style.display = "none";
+  const optionsContainer = document.getElementById('quiz-options-container');
+  if (!optionsContainer) return;
+  optionsContainer.innerHTML = '';
+  
+  const nextBtn = document.getElementById('quiz-next-btn');
+  if (nextBtn) nextBtn.style.display = 'none';
 
   q.options.forEach((option, index) => {
-    const button = document.createElement("button");
-    button.innerText = option;
-    button.className = "option-btn";
-    button.style.cssText = "display: block; width: 100%; padding: 12px; margin: 8px 0; text-align: left; background: #f3f4f6; border: 2px solid transparent; border-radius: 8px; cursor: pointer; font-size: 1rem;";
+    const button = document.createElement('button');
+    button.textContent = option;
+    button.className = 'option-btn';
+    button.style.cssText = 'display: block; width: 100%; padding: 12px; margin: 8px 0; text-align: left; background: #f3f4f6; border: 2px solid transparent; border-radius: 8px; cursor: pointer; font-size: 1rem;';
     button.onclick = () => selectQuizAnswer(button, index, q.answer);
     optionsContainer.appendChild(button);
   });
 }
 
 function selectQuizAnswer(selectedBtn, selectedIndex, correctIndex) {
-  const allButtons = document.querySelectorAll("#quiz-options-container .option-btn");
+  const allButtons = document.querySelectorAll('#quiz-options-container .option-btn');
 
   allButtons.forEach((btn, idx) => {
     btn.disabled = true;
     if (idx === correctIndex) {
-      btn.style.background = "#d1fae5";
-      btn.style.borderColor = "#10b981";
+      btn.style.background = '#d1fae5';
+      btn.style.borderColor = '#10b981';
     }
   });
 
   if (selectedIndex === correctIndex) {
     quizScore++;
   } else {
-    selectedBtn.style.background = "#fee2e2";
-    selectedBtn.style.borderColor = "#ef4444";
+    selectedBtn.style.background = '#fee2e2';
+    selectedBtn.style.borderColor = '#ef4444';
   }
 
-  document.getElementById("quiz-next-btn").style.display = "inline-block";
+  const nextBtn = document.getElementById('quiz-next-btn');
+  if (nextBtn) nextBtn.style.display = 'inline-block';
 }
 
 function nextQuizQuestion() {
@@ -387,210 +539,60 @@ function restartQuiz() {
   loadQuizQuestion();
 }
 
-// ==================== STATS & XP SYSTEM ====================
-function addXP(amount) {
-  userXP += amount;
-  localStorage.setItem("learnova_xp", userXP);
-  updateStatsUI();
-}
+// ================= SCOREBOARD =================
+function updateScoreboard() {
+  const totalSyllabus = subjectsData.reduce((sum, s) => sum + s.syllabus.length, 0);
+  const xpEl = document.getElementById('stat-xp');
+  const cardsEl = document.getElementById('stat-cards');
+  const sessEl = document.getElementById('stat-sessions');
+  const sylEl = document.getElementById('stat-syllabus');
 
-function updateStatsUI() {
-  document.getElementById("stat-xp").innerText = `${userXP} XP`;
-  document.getElementById("stat-cards").innerText = cardsMasteredCount;
-  document.getElementById("stat-sessions").innerText = focusSessionsCount;
+  if (xpEl) xpEl.textContent = `${stats.xp} XP`;
+  if (cardsEl) cardsEl.textContent = stats.cardsMastered;
+  if (sessEl) sessEl.textContent = stats.sessions;
+  if (sylEl) sylEl.textContent = totalSyllabus;
+
+  const progressPct = Math.min(100, 10 + Math.floor(stats.xp / 5));
+  const bar = document.getElementById('mastery-bar');
+  if (bar) bar.style.width = `${progressPct}%`;
+
+  let rank = 'Rising Learner (Level 1)';
+  if (stats.xp >= 200) rank = 'Master Scholar (Level 3)';
+  else if (stats.xp >= 80) rank = 'Focused Achiever (Level 2)';
   
-  let totalTopics = subjectsData.reduce((acc, sub) => acc + sub.topics.length, 0);
-  document.getElementById("stat-syllabus").innerText = totalTopics;
-
-  // Calculate Rank & Level
-  let level = Math.floor(userXP / 100) + 1;
-  let rankName = "Rising Learner";
-  if (level >= 3) rankName = "Focused Scholar";
-  if (level >= 6) rankName = "Exam Master";
-  if (level >= 10) rankName = "Grand Academic Prodigy";
-
-  document.getElementById("rank-label").innerText = `Current Rank: ${rankName} (Level ${level})`;
-  
-  let progressPercent = Math.min((userXP % 100), 100);
-  document.getElementById("mastery-bar").style.width = `${progressPercent}%`;
+  const rankLabel = document.getElementById('rank-label');
+  if (rankLabel) rankLabel.textContent = `Current Rank: ${rank} — "Learn big, earn big"`;
 }
 
-// ==================== SUBJECTS & SYLLABUS MANAGER ====================
-function renderSubjects() {
-  const grid = document.getElementById("subjects-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
+// ================= FOCUS TIMER =================
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+let selectedMinutes = 25;
 
-  subjectsData.forEach((sub) => {
-    let card = document.createElement("div");
-    card.className = "stat-card subject-card";
-    card.style.cssText = "background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: left;";
-    
-    let topicsListHtml = sub.topics.map(t => `<li style="margin: 4px 0; color: #4b5563;">• ${t}</li>`).join("");
-    if (sub.topics.length === 0) {
-      topicsListHtml = `<p style="color: #9ca3af; font-style: italic;">No syllabus topics added yet.</p>`;
-    }
-
-    card.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-        <h3 style="font-size: 1.2rem; color: #1f2937;">${sub.icon} ${sub.name}</h3>
-        <button onclick="openSyllabusModal('${sub.name}')" class="primary-btn" style="padding: 6px 12px; font-size: 0.85rem;">+ Add Syllabus</button>
-      </div>
-      <ul style="list-style: none; padding: 0; margin: 10px 0;">
-        ${topicsListHtml}
-      </ul>
-    `;
-    grid.appendChild(card);
-  });
-  localStorage.setItem("learnova_subjects", JSON.stringify(subjectsData));
-}
-
-function openSyllabusModal(subjectName) {
-  activeSubjectForSyllabus = subjectName;
-  document.getElementById("modal-subject-title").innerText = `Add Syllabus for ${subjectName}`;
-  document.getElementById("syllabus-input").value = "";
-  document.getElementById("syllabus-modal").classList.remove("hidden");
-}
-
-function closeSyllabusModal() {
-  document.getElementById("syllabus-modal").classList.add("hidden");
-}
-
-function saveSyllabus() {
-  const inputVal = document.getElementById("syllabus-input").value;
-  if (!inputVal.trim()) {
-    closeSyllabusModal();
-    return;
-  }
-
-  const newTopics = inputVal.split(/[\n,]+/).map(t => t.trim()).filter(t => t.length > 0);
-  
-  let subObj = subjectsData.find(s => s.name === activeSubjectForSyllabus);
-  if (subObj) {
-    subObj.topics.push(...newTopics);
-  }
-
-  renderSubjects();
-  updateStatsUI();
-  closeSyllabusModal();
-  addXP(20); // +20 XP reward for adding syllabus
-}
-
-// ==================== FLASHCARDS LOGIC ====================
-function filterFlashcards() {
-  const filterVal = document.getElementById("flashcard-subject-filter").value;
-  if (filterVal === "All") {
-    filteredCards = [...flashcardsData];
-  } else {
-    filteredCards = flashcardsData.filter(c => c.subject === filterVal);
-  }
-  currentCardIndex = 0;
-  loadCurrentCard();
-}
-
-function loadCurrentCard() {
-  const qEl = document.getElementById("card-question");
-  const aEl = document.getElementById("card-answer");
-  const tagEl = document.getElementById("card-tag");
-  const counterEl = document.getElementById("card-counter");
-  const innerEl = document.getElementById("flashcard-inner");
-
-  // Reset flip state
-  innerEl.style.transform = "rotateY(0deg)";
-
-  if (filteredCards.length === 0) {
-    qEl.innerText = "No flashcards found for this filter.";
-    aEl.innerText = "Add a card below!";
-    tagEl.innerText = "Empty";
-    counterEl.innerText = "Card 0 of 0";
-    return;
-  }
-
-  if (currentCardIndex >= filteredCards.length) currentCardIndex = 0;
-  if (currentCardIndex < 0) currentCardIndex = filteredCards.length - 1;
-
-  const card = filteredCards[currentCardIndex];
-  qEl.innerText = card.q;
-  aEl.innerText = card.a;
-  tagEl.innerText = card.subject;
-  counterEl.innerText = `Card ${currentCardIndex + 1} of ${filteredCards.length}`;
-}
-
-function flipCard() {
-  const inner = document.getElementById("flashcard-inner");
-  if (inner.style.transform === "rotateY(180deg)") {
-    inner.style.transform = "rotateY(0deg)";
-  } else {
-    inner.style.transform = "rotateY(180deg)";
-  }
-}
-
-function nextCard() {
-  currentCardIndex++;
-  loadCurrentCard();
-}
-
-function prevCard() {
-  currentCardIndex--;
-  loadCurrentCard();
-}
-
-function markMastered() {
-  cardsMasteredCount++;
-  localStorage.setItem("learnova_cards", cardsMasteredCount);
-  addXP(10);
-  nextCard();
-}
-
-function addFlashcard() {
-  const subject = document.getElementById("new-card-subject").value;
-  const q = document.getElementById("new-card-q").value.trim();
-  const a = document.getElementById("new-card-a").value.trim();
-
-  if (!q || !a) {
-    alert("Please fill in both question and answer fields.");
-    return;
-  }
-
-  flashcardsData.push({ subject, q, a });
-  localStorage.setItem("learnova_flashcards", JSON.stringify(flashcardsData));
-  
-  document.getElementById("new-card-q").value = "";
-  document.getElementById("new-card-a").value = "";
-  
-  filterFlashcards();
-  alert("Flashcard added successfully!");
-}
-
-// ==================== POMODORO FOCUS TIMER ====================
-function setTimerMode(minutes, btn) {
+function setTimerMode(mins, btn) {
   pauseTimer();
-  totalSeconds = minutes * 60;
-  timeLeft = totalSeconds;
+  selectedMinutes = mins;
+  timerSeconds = mins * 60;
   updateTimerDisplay();
-
-  document.querySelectorAll(".timer-modes .mode-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
 }
 
 function updateTimerDisplay() {
-  const mins = Math.floor(timeLeft / 60);
-  const secs = timeLeft % 60;
-  document.getElementById("timer-display").innerText = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+  const s = String(timerSeconds % 60).padStart(2, '0');
+  const disp = document.getElementById('timer-display');
+  if (disp) disp.textContent = `${m}:${s}`;
 }
 
 function startTimer() {
   if (timerInterval) return;
   timerInterval = setInterval(() => {
-    if (timeLeft > 0) {
-      timeLeft--;
+    if (timerSeconds > 0) {
+      timerSeconds--;
       updateTimerDisplay();
     } else {
-      pauseTimer();
-      alert("Focus session completed! Great job.");
-      focusSessionsCount++;
-      localStorage.setItem("learnova_sessions", focusSessionsCount);
-      addXP(50);
+      completeSessionEarly();
     }
   }, 1000);
 }
@@ -602,59 +604,106 @@ function pauseTimer() {
 
 function resetTimer() {
   pauseTimer();
-  timeLeft = totalSeconds;
+  timerSeconds = selectedMinutes * 60;
   updateTimerDisplay();
 }
 
 function completeSessionEarly() {
   pauseTimer();
-  focusSessionsCount++;
-  localStorage.setItem("learnova_sessions", focusSessionsCount);
-  addXP(50);
-  alert("Focus session claimed early! +50 XP added.");
-  timeLeft = totalSeconds;
-  updateTimerDisplay();
+  stats.sessions += 1;
+  stats.xp += 50;
+  updateScoreboard();
+  resetTimer();
 }
 
-// ==================== AI STUDY ASSISTANT ====================
-function sendChatMessage(event) {
-  event.preventDefault();
-  const inputEl = document.getElementById("chat-input");
-  const query = inputEl.value.trim();
-  if (!query) return;
+// ================= AI STUDY ASSISTANT =================
+async function sendChatMessage(e) {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  const question = input.value.trim();
+  if (!question) return;
 
-  const chatMessages = document.getElementById("chat-messages");
+  appendMessage(question, 'user-msg');
+  input.value = '';
 
-  // Append User message
-  const userMsgDiv = document.createElement("div");
-  userMsgDiv.className = "msg user-msg";
-  userMsgDiv.style.cssText = "background: #e0e7ff; padding: 10px 14px; border-radius: 8px; margin: 8px 0; text-align: right;";
-  userMsgDiv.innerText = query;
-  chatMessages.appendChild(userMsgDiv);
+  const typingId = 'typing-' + Date.now();
+  appendMessage('<em>Learnova AI is thinking...</em>', 'ai-msg', typingId);
 
-  inputEl.value = "";
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  const reply = await generateSmartAIResponse(question);
 
-  // Simulate Smart AI Tutor Response
-  setTimeout(() => {
-    const aiMsgDiv = document.createElement("div");
-    aiMsgDiv.className = "msg ai-msg";
-    aiMsgDiv.style.cssText = "background: #f3f4f6; padding: 10px 14px; border-radius: 8px; margin: 8px 0;";
-    aiMsgDiv.innerHTML = generateAIResponse(query);
-    chatMessages.appendChild(aiMsgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }, 600);
-}
-
-function generateAIResponse(query) {
-  const qLower = query.toLowerCase();
-  if (qLower.includes("photosynthesis")) {
-    return "🌱 <strong>Photosynthesis</strong> is the process used by plants to convert light energy into chemical energy. Equation: 6CO₂ + 6H₂O + Light → C₆H₁₂O₆ + 6O₂.";
-  } else if (qLower.includes("pythagoras") || qLower.includes("triangle")) {
-    return "📐 <strong>Pythagoras Theorem</strong> applies to right-angled triangles: <em>a² + b² = c²</em>, where <em>c</em> is the hypotenuse.";
-  } else if (qLower.includes("stress") || qLower.includes("tired")) {
-    return "💡 Study tip: Try using our <strong>Focus Timer</strong> for 25-minute blocks followed by a 5-minute break (Pomodoro Technique) to avoid burnout!";
+  const typingBubble = document.getElementById(typingId);
+  if (typingBubble) {
+    typingBubble.innerHTML = reply;
   } else {
-    return `🤖 That's a great question about <strong>"${query}"</strong>! Make sure to add this term to your Subject Syllabus or create a custom Flashcard so you can master it for your exams!`;
+    appendMessage(reply, 'ai-msg');
   }
+}
+
+function appendMessage(text, className, id = '') {
+  const box = document.getElementById('chat-messages');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = `msg ${className}`;
+  if (id) div.id = id;
+  div.innerHTML = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function generateSmartAIResponse(q) {
+  const lower = q.toLowerCase().trim();
+
+  const mathMatch = lower.replace(/^(what is|calculate|solve|=|\?)/g, '').trim();
+  if (/^[0-9+\-*/().\s^%]+$/.test(mathMatch) && /[0-9]/.test(mathMatch)) {
+    try {
+      const sanitized = mathMatch.replace(/\^/g, '**');
+      const result = Function(`"use strict"; return (${sanitized})`)();
+      if (typeof result === 'number' && !isNaN(result)) {
+        return `📐 <strong>Math Solution:</strong><br>${mathMatch} = <strong>${result}</strong>`;
+      }
+    } catch (err) {}
+  }
+
+  if (lower.includes('focus') || lower.includes('struggle') || lower.includes('tired') || lower.includes('motivat')) {
+    return `💡 <strong>Learnova Coach:</strong> Remember: <em>"Learn big, earn big!"</em><br>Try this 3-step reset:<br>1. Start one <strong>25-minute Focus Timer</strong>.<br>2. Pick just ONE topic from your Syllabus.<br>3. Flip 5 flashcards to build momentum.`;
+  }
+
+  const cleanTopic = lower
+    .replace(/^(what is|what are|who is|who was|explain|define|tell me about|how does|why does|what does)\s+/i, '')
+    .replace(/[?.!]+$/g, '')
+    .trim();
+
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanTopic)}&format=json&origin=*`;
+    const searchRes = await fetch(searchUrl);
+    const searchData = await searchRes.json();
+
+    if (searchData.query && searchData.query.search.length > 0) {
+      const bestTitle = searchData.query.search[0].title;
+      const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestTitle)}`;
+      const summaryRes = await fetch(summaryUrl);
+      const summaryData = await summaryRes.json();
+
+      if (summaryData.extract) {
+        return `🤖 <strong>${summaryData.title}:</strong><br>${summaryData.extract}<br><br><small><em>Tip: Add "${summaryData.title}" to your Subject Syllabus to earn +20 XP!</em></small>`;
+      }
+    }
+  } catch (error) {}
+
+  const offlineKnowledge = {
+    photosynthesis: '<strong>Biology:</strong> Photosynthesis is the process plants use to convert sunlight, water, and CO₂ into glucose and oxygen (6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂).',
+    pythagoras: '<strong>Maths:</strong> The Pythagorean theorem states that in a right triangle, a² + b² = c², where c is the hypotenuse.',
+    newton: '<strong>Physics:</strong> Newton’s three laws describe motion: (1) Inertia, (2) F = ma, and (3) Every action has an equal and opposite reaction.',
+    atom: '<strong>Chemistry:</strong> An atom is the smallest unit of matter, made of a central nucleus (protons & neutrons) surrounded by orbiting electrons.',
+    democracy: '<strong>Social Science:</strong> Democracy is a system of government where power is vested in the people, who rule either directly or through freely elected representatives.'
+  };
+
+  for (const key in offlineKnowledge) {
+    if (lower.includes(key)) {
+      return offlineKnowledge[key];
+    }
+  }
+
+  return `🤖 I searched for <strong>"${cleanTopic}"</strong>! Make sure you are connected to the internet so I can pull live explanations, or try asking about a specific concept like <em>"What is mitosis?"</em>, <em>"Explain gravity"</em>, or <em>"Solve 45 * 12"</em>.`;
 }
