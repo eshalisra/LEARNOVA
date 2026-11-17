@@ -607,3 +607,52 @@ input:focus, textarea:focus {
   .sidebar { width: 100%; }
   .add-card-box { grid-template-columns: 1fr; }
   }
+
+/* Chat Box Styles */
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 15px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 15px;
+}
+
+.msg {
+  padding: 10px 14px;
+  border-radius: 8px;
+  max-width: 80%;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.user-msg {
+  background: #e0e7ff;
+  color: #1e1b4b;
+  align-self: flex-end;
+  text-align: right;
+}
+
+.ai-msg {
+  background: #f3f4f6;
+  color: #1f2937;
+  align-self: flex-start;
+  text-align: left;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
