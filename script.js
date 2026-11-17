@@ -25,55 +25,7 @@ let flashcardsData = JSON.parse(localStorage.getItem("learnova_flashcards")) || 
   { subject: "Social Science", q: "Who was the first President of the United States?", a: "George Washington" }
 ];
 
-// Default Quiz Questions Bank
-let quizData = JSON.parse(localStorage.getItem("learnova_quiz")) || [
-  {
-    question: "What does HTML stand for?",
-    options: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyperlink and Text Management", "Home Tool Markup Language"],
-    answer: 0,
-    subject: "Maths"
-  },
-  {
-    question: "Which organelle is known as the powerhouse of the cell?",
-    options: ["Nucleus", "Ribosome", "Mitochondria", "Golgi Body"],
-    answer: 2,
-    subject: "Biology"
-  },
-  {
-    question: "What is the chemical symbol for Gold?",
-    options: ["Ag", "Au", "Gd", "Go"],
-    answer: 1,
-    subject: "Chemistry"
-  },
-  {
-    question: "What is the value of 9 x 8?",
-    options: ["72", "81", "64", "56"],
-    answer: 0,
-    subject: "Maths"
-  },
-  {
-    question: "Which planet is known as the Red Planet?",
-    options: ["Venus", "Saturn", "Mars", "Jupiter"],
-    answer: 2,
-    subject: "Physics"
-  }
-];
 
-let currentCardIndex = 0;
-let filteredCards = [...flashcardsData];
-
-// Quiz State
-let currentQuizIndex = 0;
-let quizScore = 0;
-let selectedQuizFilter = "All";
-
-// Timer Variables
-let timerInterval = null;
-let timeLeft = 25 * 60; // 25 minutes default
-let totalSeconds = 25 * 60;
-
-// Active Subject Modal tracker
-let activeSubjectForSyllabus = "";
 
 // ==================== APP INITIALIZATION ====================
 document.addEventListener("DOMContentLoaded", () => {
@@ -90,7 +42,141 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCurrentCard();
   loadQuizQuestion();
 });
+// ================= QUIZ DATA (25+ Questions Per Subject) =================
+let quizData = [
+  // --- MATHS (25 Questions) ---
+  { subject: 'Maths', question: 'What is the value of 9 x 8?', options: ['72', '81', '64', '56'], answer: 0 },
+  { subject: 'Maths', question: 'What is the square root of 144?', options: ['10', '11', '12', '14'], answer: 2 },
+  { subject: 'Maths', question: 'What is the value of Pi (π) to 2 decimal places?', options: ['3.14', '3.16', '3.12', '3.18'], answer: 0 },
+  { subject: 'Maths', question: 'Solve for x: 2x + 6 = 14', options: ['x = 2', 'x = 4', 'x = 6', 'x = 8'], answer: 1 },
+  { subject: 'Maths', question: 'What is the sum of angles in a triangle?', options: ['90°', '180°', '270°', '360°'], answer: 1 },
+  { subject: 'Maths', question: 'What is 15% of 200?', options: ['20', '25', '30', '35'], answer: 2 },
+  { subject: 'Maths', question: 'What is the next prime number after 7?', options: ['9', '10', '11', '13'], answer: 2 },
+  { subject: 'Maths', question: 'What is 7 cubed (7³)?', options: ['245', '343', '353', '443'], answer: 1 },
+  { subject: 'Maths', question: 'What is the area of a rectangle with length 8 and width 5?', options: ['13', '26', '40', '45'], answer: 2 },
+  { subject: 'Maths', question: 'What is the slope of the line y = 3x + 2?', options: ['2', '3', '5', '1'], answer: 1 },
+  { subject: 'Maths', question: 'Simplify: 50 ÷ 5 + 3 × 2', options: ['16', '20', '22', '26'], answer: 0 },
+  { subject: 'Maths', question: 'What is the perimeter of a square with side length 6?', options: ['12', '18', '24', '36'], answer: 2 },
+  { subject: 'Maths', question: 'What is the value of 2⁵ (2 to the power of 5)?', options: ['16', '32', '64', '128'], answer: 1 },
+  { subject: 'Maths', question: 'How many degrees are in a right angle?', options: ['45°', '90°', '180°', '360°'], answer: 1 },
+  { subject: 'Maths', question: 'What is 99 + 101?', options: ['198', '200', '202', '210'], answer: 1 },
+  { subject: 'Maths', question: 'What is the median of: 3, 7, 9, 12, 15?', options: ['7', '9', '10', '12'], answer: 1 },
+  { subject: 'Maths', question: 'What is the formula for the area of a circle?', options: ['2πr', 'πr²', 'πd', '2πr²'], answer: 1 },
+  { subject: 'Maths', question: 'What is 100 divided by 0.25?', options: ['25', '50', '200', '400'], answer: 3 },
+  { subject: 'Maths', question: 'What is the LCM of 4 and 6?', options: ['12', '24', '10', '2'], answer: 0 },
+  { subject: 'Maths', question: 'What is the HCF of 18 and 24?', options: ['3', '6', '9', '12'], answer: 1 },
+  { subject: 'Maths', question: 'Convert 3/4 to a percentage.', options: ['25%', '50%', '75%', '80%'], answer: 2 },
+  { subject: 'Maths', question: 'What is the value of x if 3x = 27?', options: ['7', '8', '9', '10'], answer: 2 },
+  { subject: 'Maths', question: 'What is the square of 15?', options: ['125', '215', '225', '255'], answer: 2 },
+  { subject: 'Maths', question: 'What is the probability of rolling a 6 on a standard die?', options: ['1/2', '1/3', '1/6', '1/4'], answer: 2 },
+  { subject: 'Maths', question: 'What is the next number in the sequence: 2, 4, 8, 16, ?', options: ['24', '30', '32', '64'], answer: 2 },
 
+  // --- CHEMISTRY (25 Questions) ---
+  { subject: 'Chemistry', question: 'What is the chemical symbol for Gold?', options: ['Ag', 'Au', 'Gd', 'Go'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the chemical formula for Water?', options: ['CO2', 'H2O', 'NaCl', 'O2'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the pH of pure neutral water?', options: ['5', '7', '9', '14'], answer: 1 },
+  { subject: 'Chemistry', question: 'Which gas is most abundant in Earth’s atmosphere?', options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Hydrogen'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is the chemical symbol for Table Salt?', options: ['KCl', 'NaCl', 'H2SO4', 'CaCO3'], answer: 1 },
+  { subject: 'Chemistry', question: 'What element has the atomic number 1?', options: ['Helium', 'Hydrogen', 'Carbon', 'Oxygen'], answer: 1 },
+  { subject: 'Chemistry', question: 'Which metal is liquid at room temperature?', options: ['Iron', 'Mercury', 'Copper', 'Zinc'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the chemical formula for Carbon Dioxide?', options: ['CO', 'CO2', 'C2O', 'O2C'], answer: 1 },
+  { subject: 'Chemistry', question: 'What gas do plants release during photosynthesis?', options: ['Carbon Dioxide', 'Nitrogen', 'Oxygen', 'Hydrogen'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is the hardest natural substance on Earth?', options: ['Gold', 'Iron', 'Diamond', 'Platinum'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is the chemical symbol for Iron?', options: ['Ir', 'In', 'Fe', 'Fi'], answer: 2 },
+  { subject: 'Chemistry', question: 'What type of bond involves sharing electron pairs?', options: ['Ionic', 'Covalent', 'Hydrogen', 'Metallic'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the chemical formula for Sulfuric Acid?', options: ['HCl', 'HNO3', 'H2SO4', 'NaOH'], answer: 2 },
+  { subject: 'Chemistry', question: 'Which noble gas is commonly used in glowing signs?', options: ['Helium', 'Neon', 'Argon', 'Krypton'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the charge of a proton?', options: ['Positive', 'Negative', 'Neutral', 'Variable'], answer: 0 },
+  { subject: 'Chemistry', question: 'What is the main component of natural gas?', options: ['Propane', 'Butane', 'Methane', 'Ethane'], answer: 2 },
+  { subject: 'Chemistry', question: 'Which element is known as the king of chemicals?', options: ['HCl', 'H2SO4', 'HNO3', 'NaCl'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the chemical symbol for Silver?', options: ['Si', 'Ag', 'Sr', 'Sl'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is baking soda chemically known as?', options: ['Sodium carbonate', 'Sodium bicarbonate', 'Sodium chloride', 'Sodium hydroxide'], answer: 1 },
+  { subject: 'Chemistry', question: 'How many valence electrons does Carbon have?', options: ['2', '3', '4', '6'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is the process of solid turning directly into gas called?', options: ['Melting', 'Evaporation', 'Sublimation', 'Condensation'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is the atomic number of Oxygen?', options: ['6', '7', '8', '9'], answer: 2 },
+  { subject: 'Chemistry', question: 'Which acid is found in lemons?', options: ['Acetic acid', 'Citric acid', 'Lactic acid', 'Hydrochloric acid'], answer: 1 },
+  { subject: 'Chemistry', question: 'What is the chemical symbol for Potassium?', options: ['P', 'Pt', 'K', 'Po'], answer: 2 },
+  { subject: 'Chemistry', question: 'What is rust chemically classified as?', options: ['Iron sulfide', 'Iron oxide', 'Iron chloride', 'Iron carbonate'], answer: 1 },
+
+  // --- PHYSICS (25 Questions) ---
+  { subject: 'Physics', question: 'Which planet is known as the Red Planet?', options: ['Venus', 'Saturn', 'Mars', 'Jupiter'], answer: 2 },
+  { subject: 'Physics', question: 'What unit is used to measure electrical resistance?', options: ['Volt', 'Ampere', 'Ohm', 'Watt'], answer: 2 },
+  { subject: 'Physics', question: 'What is the acceleration due to gravity on Earth?', options: ['8.9 m/s²', '9.8 m/s²', '10.5 m/s²', '11.2 m/s²'], answer: 1 },
+  { subject: 'Physics', question: 'Who formulated the three laws of motion?', options: ['Albert Einstein', 'Isaac Newton', 'Galileo Galilei', 'Nikola Tesla'], answer: 1 },
+  { subject: 'Physics', question: 'What is the speed of light in a vacuum approximately?', options: ['3 × 10⁶ m/s', '3 × 10⁸ m/s', '3 × 10¹⁰ m/s', '3 × 10¹² m/s'], answer: 1 },
+  { subject: 'Physics', question: 'What instrument is used to measure atmospheric pressure?', options: ['Thermometer', 'Barometer', 'Hygrometer', 'Altimeter'], answer: 1 },
+  { subject: 'Physics', question: 'What is the SI unit of force?', options: ['Joule', 'Watt', 'Newton', 'Pascal'], answer: 2 },
+  { subject: 'Physics', question: 'Energy cannot be created or destroyed. This is the law of...', options: ['Conservation of Energy', 'Thermodynamics', 'Inertia', 'Gravity'], answer: 0 },
+  { subject: 'Physics', question: 'What type of lens is used to correct myopia (nearsightedness)?', options: ['Convex', 'Concave', 'Plane', 'Cylindrical'], answer: 1 },
+  { subject: 'Physics', question: 'What is the SI unit of power?', options: ['Joule', 'Volt', 'Watt', 'Ampere'], answer: 2 },
+  { subject: 'Physics', question: 'Which color of light bends the most through a prism?', options: ['Red', 'Yellow', 'Green', 'Violet'], answer: 3 },
+  { subject: 'Physics', question: 'What does Ohm’s Law relate?', options: ['Voltage, Current, Resistance', 'Force, Mass, Acceleration', 'Work, Power, Time', 'Speed, Distance, Time'], answer: 0 },
+  { subject: 'Physics', question: 'What is the center of a lens called?', options: ['Focus', 'Pole', 'Optical Center', 'Curvature'], answer: 2 },
+  { subject: 'Physics', question: 'What type of wave is sound waves?', options: ['Transverse', 'Longitudinal', 'Electromagnetic', 'Radio'], answer: 1 },
+  { subject: 'Physics', question: 'What is the frequency unit of sound?', options: ['Decibel', 'Hertz', 'Ampere', 'Joule'], answer: 1 },
+  { subject: 'Physics', question: 'What is the work done when a force moves an object in physics?', options: ['Force × Time', 'Force × Distance', 'Mass × Acceleration', 'Power / Time'], answer: 1 },
+  { subject: 'Physics', question: 'Which subatomic particle has a negative charge?', options: ['Proton', 'Neutron', 'Electron', 'Positron'], answer: 2 },
+  { subject: 'Physics', question: 'What is the boiling point of water in Fahrenheit?', options: ['100°F', '180°F', '212°F', '32°F'], answer: 2 },
+  { subject: 'Physics', question: 'What device converts mechanical energy into electrical energy?', options: ['Motor', 'Generator', 'Transformer', 'Resistor'], answer: 1 },
+  { subject: 'Physics', question: 'What is the nearest star to Earth?', options: ['Proxima Centauri', 'Sirius', 'The Sun', 'Betelgeuse'], answer: 2 },
+  { subject: 'Physics', question: 'What is the resistance of an ideal voltmeter?', options: ['Zero', 'Very low', 'Infinite', 'Moderate'], answer: 2 },
+  { subject: 'Physics', question: 'Which physical quantity is a vector quantity?', options: ['Speed', 'Distance', 'Velocity', 'Mass'], answer: 2 },
+  { subject: 'Physics', question: 'What is the main source of energy for the sun?', options: ['Nuclear fission', 'Nuclear fusion', 'Chemical combustion', 'Gravitational pull'], answer: 1 },
+  { subject: 'Physics', question: 'What is the SI unit of frequency?', options: ['Second', 'Meter', 'Hertz', 'Newton'], answer: 2 },
+  { subject: 'Physics', question: 'What is the absolute zero temperature in Celsius?', options: ['0°C', '-100°C', '-273.15°C', '-373°C'], answer: 2 },
+
+  // --- BIOLOGY (25 Questions) ---
+  { subject: 'Biology', question: 'Which organelle is known as the powerhouse of the cell?', options: ['Nucleus', 'Ribosome', 'Mitochondria', 'Golgi Body'], answer: 2 },
+  { subject: 'Biology', question: 'What blood type is considered the universal donor?', options: ['A positive', 'B positive', 'AB positive', 'O negative'], answer: 3 },
+  { subject: 'Biology', question: 'What is the process by which plants make their food?', options: ['Respiration', 'Transpiration', 'Photosynthesis', 'Fermentation'], answer: 2 },
+  { subject: 'Biology', question: 'Which human organ produces insulin?', options: ['Liver', 'Kidney', 'Pancreas', 'Stomach'], answer: 2 },
+  { subject: 'Biology', question: 'What is the genetic material inside living organisms?', options: ['RNA', 'DNA', 'Protein', 'Lipid'], answer: 1 },
+  { subject: 'Biology', question: 'How many chambers does the human heart have?', options: ['2', '3', '4', '5'], answer: 2 },
+  { subject: 'Biology', question: 'What is the largest organ in the human body?', options: ['Liver', 'Brain', 'Skin', 'Lungs'], answer: 2 },
+  { subject: 'Biology', question: 'Which cells carry oxygen in human blood?', options: ['White blood cells', 'Red blood cells', 'Platelets', 'Plasma'], answer: 1 },
+  { subject: 'Biology', question: 'What vitamin do we get primarily from sunlight?', options: ['Vitamin A', 'Vitamin B', 'Vitamin C', 'Vitamin D'], answer: 3 },
+  { subject: 'Biology', question: 'What is the control center of a eukaryotic cell?', options: ['Cytoplasm', 'Nucleus', 'Cell Membrane', 'Ribosome'], answer: 1 },
+  { subject: 'Biology', question: 'Which plant tissue transports water?', options: ['Xylem', 'Phloem', 'Cortex', 'Stomata'], answer: 0 },
+  { subject: 'Biology', question: 'What is the process of cell division that results in identical daughter cells?', options: ['Meiosis', 'Mitosis', 'Osmosis', 'Diffusion'], answer: 1 },
+  { subject: 'Biology', question: 'What gas do humans exhale during respiration?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], answer: 2 },
+  { subject: 'Biology', question: 'Which part of the brain controls balance and coordination?', options: ['Cerebrum', 'Cerebellum', 'Medulla', 'Hypothalamus'], answer: 1 },
+  { subject: 'Biology', question: 'What is the study of fungi called?', options: ['Botany', 'Zoology', 'Mycology', 'Ecology'], answer: 2 },
+  { subject: 'Biology', question: 'Which blood cells fight infections in the body?', options: ['Red blood cells', 'White blood cells', 'Platelets', 'Neurons'], answer: 1 },
+  { subject: 'Biology', question: 'What pigment gives green color to plants?', options: ['Carotene', 'Chlorophyll', 'Xanthophyll', 'Anthocyanin'], answer: 1 },
+  { subject: 'Biology', question: 'What is the basic structural and functional unit of life?', options: ['Tissue', 'Organ', 'Cell', 'Organism'], answer: 2 },
+  { subject: 'Biology', question: 'Which animal is known as the tallest mammal?', options: ['Elephant', 'Giraffe', 'Horse', 'Kangaroo'], answer: 1 },
+  { subject: 'Biology', question: 'What is the human body’s normal temperature in Celsius?', options: ['35°C', '37°C', '39°C', '40°C'], answer: 1 },
+  { subject: 'Biology', question: 'Which organ purifies blood in the human body?', options: ['Heart', 'Lungs', 'Kidneys', 'Liver'], answer: 2 },
+  { subject: 'Biology', question: 'What is the protein responsible for hair and nail structure?', options: ['Collagen', 'Keratin', 'Insulin', 'Hemoglobin'], answer: 1 },
+  { subject: 'Biology', question: 'What type of skeleton do insects have?', options: ['Endoskeleton', 'Exoskeleton', 'Hydrostatic skeleton', 'No skeleton'], answer: 1 },
+  { subject: 'Biology', question: 'Which vitamin deficiency causes scurvy?', options: ['Vitamin A', 'Vitamin B', 'Vitamin C', 'Vitamin D'], answer: 2 },
+  { subject: 'Biology', question: 'What is the scientific name for human beings?', options: ['Homo erectus', 'Homo sapiens', 'Australopithecus', 'Pan troglodytes'], answer: 1 },
+
+  // --- SOCIAL SCIENCE (25 Questions) ---
+  { subject: 'Social Science', question: 'Who was the first President of the United States?', options: ['George Washington', 'Abraham Lincoln', 'Thomas Jefferson', 'John Adams'], answer: 0 },
+  { subject: 'Social Science', question: 'In which year did World War II end?', options: ['1940', '1945', '1950', '1939'], answer: 1 },
+  { subject: 'Social Science', question: 'Where did the Industrial Revolution begin?', options: ['France', 'United States', 'Great Britain', 'Germany'], answer: 2 },
+  { subject: 'Social Science', question: 'What are the three branches of democratic government?', options: ['Monarchy, Dictatorship, Democracy', 'Legislative, Executive, Judiciary', 'Federal, State, Local', 'Senate, House, President'], answer: 1 },
+  { subject: 'Social Science', question: 'Which ancient civilization built the pyramids of Giza?', options: ['Romans', 'Greeks', 'Egyptians', 'Mayans'], answer: 2 },
+  { subject: 'Social Science', question: 'Who wrote the book "The Wealth of Nations"?', options: ['Karl Marx', 'Adam Smith', 'John Locke', 'Thomas Hobbes'], answer: 1 },
+  { subject: 'Social Science', question: 'In which year did World War I begin?', options: ['1912', '1914', '1918', '1939'], answer: 1 },
+  { subject: 'Social Science', question: 'What is the longest river in the world?', options: ['Amazon River', 'Nile River', 'Yangtze River', 'Mississippi River'], answer: 1 },
+  { subject: 'Social Science', question: 'Which continent is known as the "Dark Continent" historically?', options: ['Asia', 'Africa', 'Australia', 'Antarctica'], answer: 1 },
+  { subject: 'Social Science', question: 'Who was the leader of the Indian independence movement using non-violence?', options: ['Subhas Chandra Bose', 'Bhagat Singh', 'Mahatma Gandhi', 'Jawaharlal Nehru'], answer: 2 },
+  { subject: 'Social Science', question: 'What is the supreme law of the land in the United States?', options: ['The Declaration of Independence', 'The Constitution', 'The Bill of Rights', 'The Emancipation Proclamation'], answer: 1 },
+  { subject: 'Social Science', question: 'Which ocean is the largest by surface area?', options: ['Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean', 'Pacific Ocean'], answer: 3 },
+  { subject: 'Social Science', question: 'What economic system features free markets and private property?', options: ['Socialism', 'Capitalism', 'Communism', 'Feudalism'], answer: 1 },
+  { subject: 'Social Science', question: 'Who painted the Mona Lisa?', options: ['Vincent van Gogh', 'Pablo Picasso', 'Leonardo da Vinci', 'Michelangelo'], answer: 2 },
+  { subject: 'Social Science', question: 'What empire was ruled by Julius Caesar?', options: ['Greek Empire', 'Roman Empire', 'Ottoman Empire', 'Persian Empire'], answer: 1 },
+  { subject: 'Social Science', question: 'What is the capital city of Australia?', options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], answer: 2 },
+  { subject: 'Social Science', question: 'Which treaty ended World War I?', options: ['Treaty of Versailles', 'Treaty of Paris', 'Treaty of Ghent', 'Treaty of Vienna'], answer: 0 },
+  { subject: 'Social Science', question: 'What is the process of people moving from rural areas to cities called?', options: ['Globalization', 'Urbanization', 'Industrialization', 'Migration'], answer: 1 },
+  { subject: 'Social Science', question: 'Who discovered America in 1492?', options: ['Vasco da Gama', 'Ferdinand Magellan', 'Christopher Columbus', 'Marco Polo'], answer: 2 },
+  { subject: 'Social Science', question: 'Which international organization was formed after WWII to maintain world peace?', options: ['League of Nations', 'United Nations', 'NATO', 'World Bank'], answer: 1 },
+  { subject: 'Social Science', question: 'What is the study of population statistics called?', options: ['Geography', 'Demography', 'Anthropology', 'Sociology'], answer: 1 },
+  { subject: 'Social Science', question: 'Which desert is the largest hot desert in the world?', options: ['Gobi Desert', 'Kalahari Desert', 'Sahara Desert', 'Mojave Desert'], answer: 2 },
+  { subject: 'Social Science', question: 'What form of government is ruled by a king or queen?', options: ['Democracy', 'Oligarchy', 'Monarchy', 'Republic'], answer: 2 },
+  { subject: 'Social Science', question: 'In which year did the French Revolution begin?', options: ['1776', '1789', '1804', '1815'], answer: 1 },
 // ==================== AUTHENTICATION LOGIC ====================
 function switchAuthTab(tab) {
   const loginBtn = document.getElementById("tab-login");
