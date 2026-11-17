@@ -656,3 +656,27 @@ input:focus, textarea:focus {
   border-radius: 6px;
   font-size: 1rem;
 }
+/* Fix Practise Quiz question visibility */
+#quiz,
+#quiz *,
+.quiz-container,
+.quiz-container *,
+#question,
+.question,
+.question-text {
+    color: #222222 !important;
+}
+
+/* Make quiz answer options readable */
+#quiz label,
+#quiz button,
+.quiz-container label,
+.quiz-container button {
+    color: #222222 !important;
+}
+
+/* Give the quiz a light background */
+#quiz,
+.quiz-container {
+    background-color: #ffffff;
+}
