@@ -1,2 +1,2 @@
-# learnova-with-quiz
-a website with many quiz
+# LEARNOVA
+A website which helps students to study effectively
